@@ -12,6 +12,8 @@ Source0:	https://github.com/cnr-isti-vclab/%{name}/archive/%{oname}-%{version}/%
 # FIXME: actually can't be build as a indipendent library
 Source10:	https://github.com/cnr-isti-vclab/vcglib/archive/%{version}/vcglib-%{version}.tar.gz
 
+BuildRequires:	cmake
+BuildRequires:	ninja
 BuildRequires:	boost-devel
 #BuildRequires:	cgal-devel
 BuildRequires:	imagemagick
