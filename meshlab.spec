@@ -19,6 +19,7 @@ BuildRequires:	boost-devel
 BuildRequires:	imagemagick
 BuildRequires:	pkgconfig(eigen3)
 BuildRequires:	pkgconfig(glew)
+BuildRequires: 	pkgconfig(glu)
 BuildRequires: 	pkgconfig(gmp)
 BuildRequires:	pkgconfig(lib3ds)
 BuildRequires:	pkgconfig(libexif)
@@ -107,7 +108,6 @@ export CMAKE_BUILD_DIR=src/build
 	-DALLOW_SYSTEM_QHULL:BOOL=ON \
 	-DALLOW_SYSTEM_XERCES:BOOL=ON \
 	-DEigen3_DIR=%{_includedir}/eigen3 \
-	-DGlew_DIR=%{_includedir}/GL \
 	-DQhull_DIR=%{_includedir}/libqhull \
 	-G Ninja
 %ninja_build
