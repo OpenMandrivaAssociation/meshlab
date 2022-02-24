@@ -4,7 +4,7 @@
 Summary:	An open source system for processing and editing 3D triangular meshes
 Name:		meshlab
 Version:	2021.10
-Release:	1
+Release:	2
 Group:		Graphics
 License:	GPLv2+ and BSD and Public Domain and ASL 2.0
 URL:		https://github.com/cnr-isti-vclab/%{name}
@@ -24,9 +24,6 @@ BuildRequires: 	pkgconfig(gmp)
 BuildRequires:	pkgconfig(lib3ds)
 BuildRequires:	pkgconfig(libexif)
 BuildRequires:	pkgconfig(muparser)
-BuildRequires:	pkgconfig(Qt5Declarative)
-BuildRequires:	pkgconfig(Qt5XmlPatterns)
-BuildRequires:	pkgconfig(Qt5Script)
 BuildRequires:	pkgconfig(xerces-c)
 BuildRequires:	pkgconfig(zlib)
 BuildRequires:	qhull-devel
