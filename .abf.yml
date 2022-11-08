@@ -1,4 +1,3 @@
 sources:
-  meshlab-2021.10.tar.gz: 1db22d88da4a183b69bf865eaed05635e6e57466
-  vcglib-2021.10.tar.gz: 9553478df1b21b443098ec86a3f8681782671c7b
-
+  meshlab-2022.02.tar.gz: ceae117330f90e940f4a48badb874532bd03f49b
+  vcglib-2022.02.tar.gz: 185268fe8d1670d817d3eeaa35ec2738df0a7225

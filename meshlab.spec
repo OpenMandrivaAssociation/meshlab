@@ -1,10 +1,10 @@
-%define oname Meshlab
+%define oname MeshLab
 %define name %(echo %oname | tr [:upper:] [:lower:])
 
 Summary:	An open source system for processing and editing 3D triangular meshes
 Name:		meshlab
-Version:	2021.10
-Release:	2
+Version:	2022.02
+Release:	1
 Group:		Graphics
 License:	GPLv2+ and BSD and Public Domain and ASL 2.0
 URL:		https://github.com/cnr-isti-vclab/%{name}
@@ -63,7 +63,7 @@ makes it easy to experiment with its algorithms interactively.
 #---------------------------------------------------------------------------
 
 %prep
-%autosetup -n meshlab-Meshlab-%{version} -a 10
+%autosetup -n %{name}-%{oname}-%{version} -a 10
 
 # use vcglib from source
 rm -fr src/vcglib
