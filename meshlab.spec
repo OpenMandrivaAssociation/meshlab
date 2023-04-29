@@ -4,7 +4,7 @@
 Summary:	An open source system for processing and editing 3D triangular meshes
 Name:		meshlab
 Version:	2022.02
-Release:	1
+Release:	2
 Group:		Graphics
 License:	GPLv2+ and BSD and Public Domain and ASL 2.0
 URL:		https://github.com/cnr-isti-vclab/%{name}
