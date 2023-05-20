@@ -64,7 +64,7 @@ makes it easy to experiment with its algorithms interactively.
 #---------------------------------------------------------------------------
 
 %prep
-%autosetup -p1 :-n %{name}-%{oname}-%{version} -a 10
+%autosetup -p1 -n %{name}-%{oname}-%{version} -a 10
 
 # use vcglib from source
 rm -fr src/vcglib
