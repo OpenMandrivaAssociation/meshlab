@@ -11,6 +11,7 @@ URL:		https://github.com/cnr-isti-vclab/meshlab
 Source0:	https://github.com/cnr-isti-vclab/meshlab/archive/MeshLab-%{version}/%{name}-%{version}.tar.gz
 # FIXME: actually can't be build as a indipendent library
 Source10:	https://github.com/cnr-isti-vclab/vcglib/archive/%{version}/vcglib-%{version}.tar.gz
+Patch0:		fix_clang16.patch
 
 BuildRequires:	cmake
 BuildRequires:	ninja
