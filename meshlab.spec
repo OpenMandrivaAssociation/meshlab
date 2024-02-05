@@ -156,9 +156,9 @@ sed -i -e 's|"lib"|"%{_lib}"|g' src/common/globals.cpp
 
 %build
 %global cpp_std c++17
-#export CXXFLAGS=`echo %{optflags} -std=c++14 -fopenmp -DSYSTEM_QHULL -I/usr/include/libqhull`
-
+export CXXFLAGS="%{optflags} -fopenmp -DSYSTEM_QHULL -I/usr/include/libqhull"
 export CMAKE_BUILD_DIR=src/build
+
 #global _vpath_srcdir src
 #	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_BOOST:BOOL=OFF \
 #	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_CGAL:BOOL=OFF \
