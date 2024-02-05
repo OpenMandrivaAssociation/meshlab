@@ -1,0 +1,14 @@
+diff -up meshlab-Meshlab-2021.07/src/CMakeLists.txt.libdirfix meshlab-Meshlab-2021.07/src/CMakeLists.txt
+--- meshlab-Meshlab-2021.07/src/CMakeLists.txt.libdirfix	2021-09-20 13:53:47.095514858 -0400
++++ meshlab-Meshlab-2021.07/src/CMakeLists.txt	2021-09-20 13:55:06.602952041 -0400
+@@ -50,8 +50,8 @@ if (USE_DEFAULT_BUILD_AND_INSTALL_DIRS)
+ 	include(GNUInstallDirs)
+ 	if(INSTALL_TO_UNIX_LAYOUT)
+ 		set(MESHLAB_BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
+-		set(MESHLAB_LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/meshlab)
+-		set(MESHLAB_PLUGIN_INSTALL_DIR ${MESHLAB_LIB_INSTALL_DIR}/plugins)
++		set(MESHLAB_LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
++		set(MESHLAB_PLUGIN_INSTALL_DIR ${MESHLAB_LIB_INSTALL_DIR}/meshlab/plugins)
+ 		set(MESHLAB_SHADER_INSTALL_DIR ${CMAKE_INSTALL_DATAROOTDIR}/meshlab/shaders)
+ 	elseif(APPLE)
+ 		set(MESHLAB_BIN_INSTALL_DIR .)
