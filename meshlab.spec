@@ -64,6 +64,7 @@ BuildRequires:	pkgconfig(levmar)
 BuildRequires:	pkgconfig(lib3ds)
 BuildRequires:	pkgconfig(libexif)
 BuildRequires:	pkgconfig(muparser)
+BuildRequires:	pkgconfig(mpfr)
 BuildRequires:	pkgconfig(xerces-c)
 BuildRequires:	pkgconfig(zlib)
 BuildRequires:	qhull-devel
