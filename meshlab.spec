@@ -2,16 +2,17 @@
 %global name %(echo %oname | tr [:upper:] [:lower:])
 
 %global bundled_libE57Format_version	2.3.0
-%global bundled_libigl_version			2.4.0
-%global bundled_OpenCTM_version			1.0.3
+%global bundled_libigl_version		2.4.0
+%global bundled_OpenCTM_version		1.0.3
 %global bundled_StructureSynth_version	1.5.1
-%global bundled_tinygltf_version		2.6.3
-%global bundled_u3d_version				1.5.1
+%global bundled_tinygltf_version	2.6.3
+%global bundled_u3d_version		1.5.1
+
 
 Summary:	An open source system for processing and editing 3D triangular meshes
 Name:		meshlab
 Version:	2023.12
-Release:	2
+Release:	1
 Group:		Graphics
 # Bundled e57 is Boost-licensed
 # bundled glew is BSD-3-Clause
@@ -40,7 +41,7 @@ Source14:	https://www.meshlab.net/data/libs/OpenCTM-%{bundled_OpenCTM_version}-s
 #   nexsus (Meshlab's fork of StructureSynth
 Source15:	https://github.com/alemuntoni/StructureSynth/archive/refs/tags/%{bundled_StructureSynth_version}/StructureSynth-%{bundled_StructureSynth_version}.zip
 #   tinygltf 
-#   FIXME: meshlar requirees an old version
+#   FIXME: meshlab requirees an old version
 Source16:	https://github.com/syoyo/tinygltf/archive/refs/tags/v%{bundled_tinygltf_version}/tinygltf-%{bundled_tinygltf_version}.zip
 #   u3d
 #   FIXME: consider packaging it separately
@@ -54,12 +55,14 @@ BuildRequires:	cmake
 BuildRequires:	ninja
 BuildRequires:	boost-devel
 BuildRequires:	cmake(cgal)
+BuildRequires:	cmake(e57format)
 BuildRequires:	imagemagick
 BuildRequires:	pkgconfig(bzip2)
 BuildRequires:	pkgconfig(eigen3)
 BuildRequires:	pkgconfig(glew)
 BuildRequires: 	pkgconfig(glu)
 BuildRequires: 	pkgconfig(gmp)
+BuildRequires: 	pkgconfig(gmpxx)
 BuildRequires:	pkgconfig(levmar)
 BuildRequires:	pkgconfig(lib3ds)
 BuildRequires:	pkgconfig(libexif)
@@ -89,15 +92,16 @@ makes it easy to experiment with its algorithms interactively.
 
 %files
 %license LICENSE.txt
-%license src/external/u3d/COPYING
-%license distrib/shaders/3Dlabs-license.txt
-%license distrib/shaders/LightworkDesign-license.txt
+%license src/external/downloads/u3d-*/COPYING
+%license resources/shaders/3Dlabs-license.txt
+%license resources/shaders/LightworkDesign-license.txt
 #license unsupported/plugins_experimental/filter_segmentation/license.txt
 #license unsupported/plugins_unsupported/filter_poisson/license.txt
 %doc README.md
 %doc docs/readme.txt
 %doc docs/privacy.txt
 %{_bindir}/%{name}*
+%{_libdir}/*.so*
 %{_libdir}/%{name}/
 %{_datadir}/%{name}/
 %{_datadir}/applications/%{name}.desktop
@@ -137,12 +141,12 @@ popd
 popd
 
 # These patches need to apply after we build the bundled tree
-#%patch -P 3 -p1 -b .e57-gcc13
+#patch -P 3 -p1 -b .e57-gcc13
 %patch -P 2 -p1 -b .cstdint
 
-	
+
 # remove some bundles
-	
+
 %if 0
 rm -rf src/external/glew*
 rm -rf src/external/qhull*
@@ -155,61 +159,45 @@ rm -rf src/external/muparser*
 sed -i -e 's|"lib"|"%{_lib}"|g' src/common/globals.cpp
 
 %build
+export CC=gcc
+export CXX=g++
 %global cpp_std c++17
 export CXXFLAGS="%{optflags} -fopenmp -DSYSTEM_QHULL -I/usr/include/libqhull"
 export CMAKE_BUILD_DIR=src/build
 
 #global _vpath_srcdir src
-#	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_BOOST:BOOL=OFF \
-#	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_CGAL:BOOL=OFF \
-#	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_LIBE57:BOOL=ON \
-#	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_EMBREE:BOOL=ON \
-#	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_LEVMAR:BOOL=OFF \
-#	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_LIB3DS:BOOL=OFF \
-#	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_LIBIGL:BOOL=ON \
-#	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_MUPARSER:BOOL=OFF \
-#	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_NEXUS:BOOL=ON \
-#	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_OPENCTM:BOOL=ON \
-#	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_STRUCTURE_SYNTH:BOOL=ON \
-#	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_TINYGLTF:BOOL=ON \
-#	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_U3D:BOOL=ON \
-#	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_XERCES:BOOL=OFF \
-#	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_QHULL:BOOL=OFF \
-#	-DMESHLAB_ALLOW_BUNDLED_SOURCE_EASYEXIF:BOOL=ON \
-#	-DMESHLAB_ALLOW_BUNDLED_SOURCE_GLEW:BOOL=OFF \
-#	-DMESHLAB_ALLOW_BUNDLED_NEWUOA:BOOL=ON \
-#	-DMESHLAB_ALLOW_SYSTEM_BOOST:BOOL=ON \
-#	-DMESHLAB_ALLOW_SYSTEM_CGAL:BOOL=ON \
-#	-DMESHLAB_ALLOW_SYSTEM_EMBREE:BOOL=ON \
-#	-DMESHLAB_ALLOW_SYSTEM_GLEW:BOOL=ON \
-#	-DMESHLAB_ALLOW_SYSTEM_LIB3DS_BOOL=ON \
-#	-DMESHLAB_ALLOW_SYSTEM_MUPARSER:BOOL=ON \
-#	-DMESHLAB_ALLOW_SYSTEM_OPENCTM:BOOL=ON \
-#	-DMESHLAB_ALLOW_SYSTEM_QHULL:BOOL=ON \
-#	-DMESHLAB_ALLOW_SYSTEM_XERCES:BOOL=ON \
 %cmake -Wno-dev \
 	-DMESHLAB_USE_DEFAULT_BUILD_AND_INSTALL_DIRS:BOOL=ON \
 	-DCMAKE_SKIP_RPATH:PATH=ON \
 	-DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
-	-DALLOW_BUNDLED_EIGEN:BOOL=OFF \
-	-DALLOW_BUNDLED_GLEW:BOOL=OFF \
-	-DALLOW_BUNDLED_LEVMAR:BOOL=ON \
-	-DALLOW_BUNDLED_LIB3DS:BOOL=OFF \
-	-DALLOW_BUNDLED_MUPARSER:BOOL=OFF \
-	-DALLOW_BUNDLED_NEWUOA:BOOL=ON \
-	-DALLOW_BUNDLED_OPENCTM:BOOL=ON \
-	-DALLOW_BUNDLED_QHULL:BOOL=OFF \
-	-DALLOW_BUNDLED_SSYNTH:BOLL=ON \
-	-DALLOW_BUNDLED_XERCES:BOOL=OFF \
-	-DALLOW_SYSTEM_EIGEN:BOOL=ON \
-	-DALLOW_SYSTEM_GLEW:BOOL=ON \
-	-DALLOW_SYSTEM_GMP:BOOL=ON \
-	-DALLOW_SYSTEM_LIB3DS:BOOL=ON \
-	-DALLOW_SYSTEM_MUPARSER:BOOL=ON \
-	-DALLOW_SYSTEM_OPENCTM:BOOL=ON \
-	-DALLOW_SYSTEM_QHULL:BOOL=ON \
-	-DALLOW_SYSTEM_XERCES:BOOL=ON \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_BOOST:BOOL=OFF \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_CGAL:BOOL=OFF \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_LIBE57:BOOL=ON \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_EMBREE:BOOL=ON \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_LEVMAR:BOOL=OFF \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_LIB3DS:BOOL=OFF \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_LIBIGL:BOOL=ON \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_MUPARSER:BOOL=OFF \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_NEXUS:BOOL=ON \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_OPENCTM:BOOL=ON \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_STRUCTURE_SYNTH:BOOL=ON \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_TINYGLTF:BOOL=ON \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_U3D:BOOL=ON \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_XERCES:BOOL=OFF \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_QHULL:BOOL=OFF \
+	-DMESHLAB_ALLOW_BUNDLED_SOURCE_EASYEXIF:BOOL=ON \
+	-DMESHLAB_ALLOW_BUNDLED_SOURCE_GLEW:BOOL=OFF \
+	-DMESHLAB_ALLOW_BUNDLED_NEWUOA:BOOL=ON \
+	-DMESHLAB_ALLOW_SYSTEM_BOOST:BOOL=ON \
+	-DMESHLAB_ALLOW_SYSTEM_CGAL:BOOL=ON \
+	-DMESHLAB_ALLOW_SYSTEM_EMBREE:BOOL=ON \
+	-DMESHLAB_ALLOW_SYSTEM_GLEW:BOOL=ON \
+	-DMESHLAB_ALLOW_SYSTEM_LIB3DS_BOOL=ON \
+	-DMESHLAB_ALLOW_SYSTEM_MUPARSER:BOOL=ON \
+	-DMESHLAB_ALLOW_SYSTEM_OPENCTM:BOOL=ON \
+	-DMESHLAB_ALLOW_SYSTEM_QHULL:BOOL=ON \
+	-DMESHLAB_ALLOW_SYSTEM_XERCES:BOOL=ON \
 	-DEigen3_DIR=%{_includedir}/eigen3 \
 	-DQhull_DIR=%{_includedir}/libqhull \
 	-G Ninja
