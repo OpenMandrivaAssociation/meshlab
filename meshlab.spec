@@ -56,6 +56,7 @@ BuildRequires:	ninja
 BuildRequires:	boost-devel
 BuildRequires:	cmake(cgal)
 BuildRequires:	cmake(e57format)
+BuildRequires:	gomp-devel
 BuildRequires:	imagemagick
 BuildRequires:	pkgconfig(bzip2)
 BuildRequires:	pkgconfig(eigen3)
