@@ -1,0 +1,10 @@
+--- a/src/external/downloads/libE57Format-2.3.0/include/E57Format.h
++++ b/src/external/downloads/libE57Format-2.3.0/include/E57Format.h
+@@ -31,6 +31,7 @@
+ 
+ //! @file  E57Format.h Header file for the E57 API.
+ 
++#include <cstdint>
+ #include <cfloat>
+ #include <memory>
+ #include <vector>

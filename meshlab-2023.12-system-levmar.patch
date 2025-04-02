@@ -1,0 +1,138 @@
+diff -up meshlab-MeshLab-2023.12/src/cmake/FindLevmar.cmake.system-levmar meshlab-MeshLab-2023.12/src/cmake/FindLevmar.cmake
+--- meshlab-MeshLab-2023.12/src/cmake/FindLevmar.cmake.system-levmar	2023-12-31 17:16:23.130001534 -0500
++++ meshlab-MeshLab-2023.12/src/cmake/FindLevmar.cmake	2023-12-31 17:16:10.647821821 -0500
+@@ -0,0 +1,54 @@
++# - Find levmar
++# Find the levmar library
++#
++#  Levmar::Levmar - Imported target to use
++#  LEVMAR_FOUND - True if levmar was found.
++#
++# Original Author:
++# 2020 Tom Callaway <spot@fedoraproject.org>
++#
++# Based on code by:
++# Collabora, Ltd. 2019
++# 2019 Ryan Pavlik <ryan.pavlik@collabora.com> <ryan.pavlik@gmail.com>
++#
++# Distributed under the Boost Software License, Version 1.0.
++# (See accompanying file LICENSE_1_0.txt or copy at
++# http://www.boost.org/LICENSE_1_0.txt)
++#
++# SPDX-License-Identifier: BSL-1.0
++
++set(LEVMAR_ROOT_DIR
++    "${LEVMAR_ROOT_DIR}"
++       CACHE
++       PATH
++    "Directory to search for liblevmar")
++find_path(LEVMAR_INCLUDE_DIR
++    NAMES
++    levmar.h
++    PATHS
++    "${LEVMAR_ROOT_DIR}")
++find_library(LEVMAR_LIBRARY
++    NAMES levmar
++    PATHS
++    "${LEVMAR_ROOT_DIR}")
++
++include(FindPackageHandleStandardArgs)
++find_package_handle_standard_args(Levmar
++    DEFAULT_MSG
++    LEVMAR_INCLUDE_DIR
++    LEVMAR_LIBRARY)
++
++if(LEVMAR_FOUND)
++    if(NOT TARGET Levmar::Levmar)
++        add_library(Levmar::Levmar UNKNOWN IMPORTED)
++        set_target_properties(Levmar::Levmar
++            PROPERTIES
++            IMPORTED_LOCATION "${LEVMAR_LIBRARY}"
++            INTERFACE_INCLUDE_DIRECTORIES "${LEVMAR_INCLUDE_DIR}")
++    endif()
++    set(LEVMAR_INCLUDE_DIRS ${LEVMAR_INCLUDE_DIR})
++    set(LEVMAR_LIBRARIES ${LEVMAR_LIBRARY})
++    mark_as_advanced(LEVMAR_ROOT_DIR)
++endif()
++
++mark_as_advanced(LEVMAR_INCLUDE_DIR LEVMAR_LIBRARY)
+diff -up meshlab-MeshLab-2023.12/src/external/levmar.cmake.system-levmar meshlab-MeshLab-2023.12/src/external/levmar.cmake
+--- meshlab-MeshLab-2023.12/src/external/levmar.cmake.system-levmar	2023-12-31 17:09:40.579167996 -0500
++++ meshlab-MeshLab-2023.12/src/external/levmar.cmake	2023-12-31 17:11:55.949130140 -0500
+@@ -3,8 +3,15 @@
+ # SPDX-License-Identifier: BSL-1.0
+ 
+ option(MESHLAB_ALLOW_DOWNLOAD_SOURCE_LEVMAR "Allow download and use of levmar source" ON)
++option(MESHLAB_ALLOW_SYSTEM_LEVMAR "Allow use of system-provided levmar" ON)
+ 
+-if(MESHLAB_ALLOW_DOWNLOAD_SOURCE_LEVMAR)
++find_package(Levmar)
++
++if(MESHLAB_ALLOW_SYSTEM_LEVMAR AND TARGET Levmar::Levmar)
++        message(STATUS "- levmar - using system-provided library")
++        add_library(external-levmar INTERFACE)
++        target_link_libraries(external-levmar INTERFACE Levmar::Levmar)
++elseif(MESHLAB_ALLOW_DOWNLOAD_SOURCE_LEVMAR)
+ 	set(LEVMAR_VERSION "2.6.1")
+ 
+ 	set(LEVMAR_DIR "${MESHLAB_EXTERNAL_DOWNLOAD_DIR}/levmar-${LEVMAR_VERSION}")
+diff -up meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_curvature_from_sliding/curvature_from_sliding.h.system-levmar meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_curvature_from_sliding/curvature_from_sliding.h
+--- meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_curvature_from_sliding/curvature_from_sliding.h.system-levmar	2023-12-31 17:13:25.065421845 -0500
++++ meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_curvature_from_sliding/curvature_from_sliding.h	2023-12-31 17:13:35.874578520 -0500
+@@ -30,7 +30,7 @@
+ #include <vcg/complex/allocate.h>
+ #include <vcg/complex/algorithms/subset.h>
+ #include <vcg/space/index/grid_static_ptr.h>
+-#include <lib/levmar/lm.h>
++#include <levmar.h>
+ 
+ #include "frame.h"
+ 
+diff -up meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo/levmarmethods.h.system-levmar meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo/levmarmethods.h
+--- meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo/levmarmethods.h.system-levmar	2023-12-31 17:13:49.379774272 -0500
++++ meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo/levmarmethods.h	2023-12-31 17:14:06.521022733 -0500
+@@ -12,7 +12,7 @@ sufficient to get a calibrated shot.<br>
+ 
+ #include <list>
+ 
+-#include "../../external/levmar-2.3/lm.h"
++#include <levmar.h>
+ 
+ 
+ struct LevmarCorrelation {
+diff -up meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo/solver.h.system-levmar meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo/solver.h
+--- meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo/solver.h.system-levmar	2023-12-31 17:14:14.486138182 -0500
++++ meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo/solver.h	2023-12-31 17:14:27.165321962 -0500
+@@ -5,7 +5,7 @@
+ #include "alignset.h"
+ 
+ #include "parameters.h"
+-#include "../../external/levmar-2.3/lm.h"
++#include <levmar.h>
+ 
+ #include <iostream>
+ #include <fstream>
+diff -up meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo_xml/levmarmethods.h.system-levmar meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo_xml/levmarmethods.h
+--- meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo_xml/levmarmethods.h.system-levmar	2023-12-31 17:14:39.355498654 -0500
++++ meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo_xml/levmarmethods.h	2023-12-31 17:14:48.471630788 -0500
+@@ -12,7 +12,7 @@ sufficient to get a calibrated shot.<br>
+ 
+ #include <list>
+ 
+-#include "lm.h"
++#include <levmar.h>
+ 
+ 
+ struct LevmarCorrelation {
+diff -up meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo_xml/solver.h.system-levmar meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo_xml/solver.h
+--- meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo_xml/solver.h.system-levmar	2023-12-31 17:14:58.595777532 -0500
++++ meshlab-MeshLab-2023.12/unsupported/plugins_unsupported/filter_mutualinfo_xml/solver.h	2023-12-31 17:15:10.028943257 -0500
+@@ -5,7 +5,7 @@
+ #include "alignset.h"
+ 
+ #include "parameters.h"
+-#include "lm.h"
++#include <levmar.h>	
+ 
+ #include <iostream>
+ #include <fstream>

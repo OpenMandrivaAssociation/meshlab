@@ -1,0 +1,11 @@
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -2,6 +2,8 @@
+ # Copyright 2019, 2021, Visual Computing Lab, ISTI - Italian National Research Council
+ # SPDX-License-Identifier: BSL-1.0
+ 
++cmake_minimum_required(VERSION 4.0)
++
+ ### Dependencies
+ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/meshlab_global_settings.cmake" NO_POLICY_SCOPE)

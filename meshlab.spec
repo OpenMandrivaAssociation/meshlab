@@ -8,6 +8,8 @@
 %global bundled_tinygltf_version	2.6.3
 %global bundled_u3d_version		1.5.1
 
+%bcond_with	system_e57
+%bcond_without	system_levmar
 
 Summary:	An open source system for processing and editing 3D triangular meshes
 Name:		meshlab
@@ -20,6 +22,7 @@ Group:		Graphics
 License:	GPLv2+ and BSD-2-Clause and BSD-3-Clause and Public Domain and ASL 2.0 and BSL-1.0
 URL:		https://github.com/cnr-isti-vclab/meshlab
 Source0:	https://github.com/cnr-isti-vclab/meshlab/archive/MeshLab-%{version}/%{name}-%{version}.tar.gz
+Source100:	%{name}.rpmlintrc
 # FIXME: actually can't be build as a indipendent library
 Source1:	https://github.com/cnr-isti-vclab/vcglib/archive/%{version}/vcglib-%{version}.tar.gz
 # External projects are no more bundled into the archive
@@ -50,13 +53,20 @@ Source17:	https://www.meshlab.net/data/libs/u3d-%{bundled_u3d_version}.zip
 Patch0:		fix_clang16.patch
 Patch1:		meshlab-2023.12-fix_cmake_install_path.patch
 Patch2:		meshlab-2023.12-corto-cstdint.patch
+Patch3:		meshlab-2023.12-cmake.patch
+Patch4:		meshlab-2023.12-e57.patch
+Patch100:	meshlab-2023.12-unbundle-e57format.patch
+# (fedora)
+Patch101:	https://src.fedoraproject.org/rpms/meshlab/raw/rawhide/f/meshlab-2023.12-system-levmar.patch
 
 BuildRequires:	cmake
 BuildRequires:	ninja
 BuildRequires:	boost-devel
 BuildRequires:	cmake(cgal)
+%if %{with system_e57}
 BuildRequires:	cmake(e57format)
-BuildRequires:	gomp-devel
+%endif
+BuildRequires:	cmake(qhull)
 BuildRequires:	imagemagick
 BuildRequires:	pkgconfig(bzip2)
 BuildRequires:	pkgconfig(eigen3)
@@ -71,7 +81,6 @@ BuildRequires:	pkgconfig(muparser)
 BuildRequires:	pkgconfig(mpfr)
 BuildRequires:	pkgconfig(xerces-c)
 BuildRequires:	pkgconfig(zlib)
-BuildRequires:	qhull-devel
 BuildRequires:	qt5-qtbase-devel
 #BuildRequires:	qt5-qtdeclarative
 #BuildRequires:	qt5-qtxmlpatterns
@@ -115,6 +124,13 @@ makes it easy to experiment with its algorithms interactively.
 #autosetup -p1 -n %{name}-%{oname}-%{version} -a 10
 %setup -q -n meshlab-MeshLab-%{version} -a 1
 %patch -P 1 -p1 -b .libdirfix
+%patch -P 3 -p1 -b .cmake
+%if %{with system_e57}
+%patch -P 100 -p1 -b .system-e57
+%endif
+%if %{with system_levmar}
+%patch -P 101 -p1 -b .system-levmar
+%endif
 
 # use vcglib from source
 rm -fr src/vcglib
@@ -127,7 +143,9 @@ sed -i -e 's|"lib"|"%{_lib}"|g' src/common/globals.cpp
 pushd src/external
 mkdir -p downloads
 cd downloads
+%if ! %{with system_e57}
 unzip %{SOURCE10}
+%endif
 unzip %{SOURCE11}
 unzip %{SOURCE12}
 unzip %{SOURCE14}
@@ -142,9 +160,8 @@ popd
 popd
 
 # These patches need to apply after we build the bundled tree
-#patch -P 3 -p1 -b .e57-gcc13
 %patch -P 2 -p1 -b .cstdint
-
+%patch -P 4 -p1 -b .e57
 
 # remove some bundles
 
@@ -174,7 +191,8 @@ export CMAKE_BUILD_DIR=src/build
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_BOOST:BOOL=OFF \
 	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_CGAL:BOOL=OFF \
-	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_LIBE57:BOOL=ON \
+	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_LIBE57:BOOL=%{?!with_system_e57:ON}%{?with_system_e57:OFF} \
+	-DMESHLAB_ALLOW_SYSTEM_LIBE57_FORMAT:BOOL=%{?with_system_e57:ON}%{?!with_system_e57:OFF} \
 	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_EMBREE:BOOL=ON \
 	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_LEVMAR:BOOL=OFF \
 	-DMESHLAB_ALLOW_DOWNLOAD_SOURCE_LIB3DS:BOOL=OFF \
