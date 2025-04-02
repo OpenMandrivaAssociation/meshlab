@@ -67,6 +67,7 @@ BuildRequires:	cmake(cgal)
 BuildRequires:	cmake(e57format)
 %endif
 BuildRequires:	cmake(qhull)
+BuildRequires:	gomp-devel
 BuildRequires:	imagemagick
 BuildRequires:	pkgconfig(bzip2)
 BuildRequires:	pkgconfig(eigen3)
