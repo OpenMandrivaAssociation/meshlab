@@ -17,3 +17,78 @@
  	if(MESHLAB_ALLOW_DOWNLOAD_SOURCE_LIBE57)
  		set(LIBE57_DIR "${MESHLAB_EXTERNAL_DOWNLOAD_DIR}/libE57Format-2.3.0")
  		set(LIBE57_CHECK "${LIBE57_DIR}/CMakeLists.txt")
+--- a/src/meshlabplugins/io_e57/io_e57.cpp
++++ b/src/meshlabplugins/io_e57/io_e57.cpp
+@@ -257,7 +257,7 @@ void E57IOPlugin::save(const QString& fo
+     E57_WRAPPER(fileWriter.IsOpen(), "Error while opening E57 file for writing!");
+ 
+     scanHeader.guid = QUuid::createUuid().toString(QUuid::WithBraces).toStdString();
+-    scanHeader.pointsSize = static_cast<int64_t>(totalPoints);
++    scanHeader.pointCount = static_cast<int64_t>(totalPoints);
+ 
+     e57::Translation translation;
+     e57::Quaternion quaternion;
+@@ -289,21 +289,21 @@ void E57IOPlugin::save(const QString& fo
+     scanHeader.pointFields.cartesianZField = true;
+ 
+     if ((mask & Mask::IOM_VERTNORMAL) != 0) {
+-        scanHeader.pointFields.normalX = true;
+-        scanHeader.pointFields.normalY = true;
+-        scanHeader.pointFields.normalZ = true;
++        scanHeader.pointFields.normalXField = true;
++        scanHeader.pointFields.normalYField = true;
++        scanHeader.pointFields.normalZField = true;
+     }
+     if ((mask & Mask::IOM_VERTCOLOR) != 0) {
+         scanHeader.pointFields.isColorInvalidField = false;
+         scanHeader.pointFields.colorRedField = true;
+         scanHeader.pointFields.colorGreenField = true;
+         scanHeader.pointFields.colorBlueField = true;
+-        scanHeader.colorLimits.colorRedMinimum = e57::E57_UINT8_MIN;
+-        scanHeader.colorLimits.colorRedMaximum = e57::E57_UINT8_MAX;
+-        scanHeader.colorLimits.colorGreenMinimum = e57::E57_UINT8_MIN;
+-        scanHeader.colorLimits.colorGreenMaximum = e57::E57_UINT8_MAX;
+-        scanHeader.colorLimits.colorBlueMinimum = e57::E57_UINT8_MIN;
+-        scanHeader.colorLimits.colorBlueMaximum = e57::E57_UINT8_MAX;
++        scanHeader.colorLimits.colorRedMinimum = e57::UINT8_MIN;
++        scanHeader.colorLimits.colorRedMaximum = UINT8_MAX;
++        scanHeader.colorLimits.colorGreenMinimum = e57::UINT8_MIN;
++        scanHeader.colorLimits.colorGreenMaximum = UINT8_MAX;
++        scanHeader.colorLimits.colorBlueMinimum = e57::UINT8_MIN;
++        scanHeader.colorLimits.colorBlueMaximum = UINT8_MAX;
+     }
+     if ((mask & Mask::IOM_VERTQUALITY) != 0) {
+         float min = std::numeric_limits<float>::max();
+--- a/src/meshlabplugins/io_e57/io_e57.h
++++ b/src/meshlabplugins/io_e57/io_e57.h
+@@ -58,14 +58,14 @@ namespace vcg {
+                 std::vector<int8_t> sphericalInvalidState;
+ 
+                 // Intensity
+-                std::vector<float> intensity; /* Quality */
++                std::vector<double> intensity; /* Quality */
+                 std::vector<int8_t> intensityInvalid;
+ 
+                 // Colors
+-                std::vector<uint8_t> colorRed;
+-                std::vector<uint8_t> colorGreen;
+-                std::vector<uint8_t> colorBlue;
+-                std::vector<int8_t> colorInvalid;
++                std::vector<uint16_t> colorRed;
++                std::vector<uint16_t> colorGreen;
++                std::vector<uint16_t> colorBlue;
++                std::vector<int8_t> colorInvalid;
+ 
+                 // Normals
+                 std::vector<float> normalX;
+@@ -136,8 +136,8 @@ namespace vcg {
+                         }
+                     }
+ 
+-                    if (scanHeader.pointFields.normalX && scanHeader.pointFields.normalY &&
+-                        scanHeader.pointFields.normalZ) {
++                    if (scanHeader.pointFields.normalXField && scanHeader.pointFields.normalYField &&
++                        scanHeader.pointFields.normalZField) {
+ 
+                         normalX.resize(buffSize); normalY.resize(buffSize); normalZ.resize(buffSize);
+ 

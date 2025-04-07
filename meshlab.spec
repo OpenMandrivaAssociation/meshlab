@@ -8,13 +8,13 @@
 %global bundled_tinygltf_version	2.6.3
 %global bundled_u3d_version		1.5.1
 
-%bcond_with	system_e57
+%bcond_without	system_e57
 %bcond_without	system_levmar
 
 Summary:	An open source system for processing and editing 3D triangular meshes
 Name:		meshlab
 Version:	2023.12
-Release:	1
+Release:	2
 Group:		Graphics
 # Bundled e57 is Boost-licensed
 # bundled glew is BSD-3-Clause
@@ -27,7 +27,6 @@ Source100:	%{name}.rpmlintrc
 Source1:	https://github.com/cnr-isti-vclab/vcglib/archive/%{version}/vcglib-%{version}.tar.gz
 # External projects are no more bundled into the archive
 #   libE57Format
-#   FIXME: consider packaging it separately
 Source10:	https://github.com/asmaloney/libE57Format/archive/refs/tags/v%{bundled_libE57Format_version}/libE57Format-%{bundled_libE57Format_version}.zip
 #   libigl
 #   FIXME: consider packaging it separately
@@ -162,7 +161,9 @@ popd
 
 # These patches need to apply after we build the bundled tree
 %patch -P 2 -p1 -b .cstdint
+%if ! %{with system_e57}
 %patch -P 4 -p1 -b .e57
+%endif
 
 # remove some bundles
 
