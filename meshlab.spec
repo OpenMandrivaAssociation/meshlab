@@ -14,7 +14,7 @@
 Summary:	An open source system for processing and editing 3D triangular meshes
 Name:		meshlab
 Version:	2023.12
-Release:	2
+Release:	3
 Group:		Graphics
 # Bundled e57 is Boost-licensed
 # bundled glew is BSD-3-Clause
